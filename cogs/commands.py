@@ -91,6 +91,53 @@ class BenCommands(commands.Cog, name="Commands"):
         await inter.response.defer()
         await inter.followup.send(file=discord.File("files/burp.gif"))
 
+    @app_commands.command(name="experiment", description="Experiment with different potion combinations!")
+    @app_commands.describe(first_colour="The first colour to use")
+    @app_commands.describe(second_colour="The second colour to use")
+    @app_commands.choices(
+        first_colour=[
+            app_commands.Choice(name="yellow", value=1),
+            app_commands.Choice(name="green", value=2),
+            app_commands.Choice(name="cyan", value=3),
+            app_commands.Choice(name="purple", value=4),
+            app_commands.Choice(name="blue", value=5),
+        ],
+        second_colour=[
+            app_commands.Choice(name="yellow", value=1),
+            app_commands.Choice(name="green", value=2),
+            app_commands.Choice(name="cyan", value=3),
+            app_commands.Choice(name="purple", value=4),
+            app_commands.Choice(name="blue", value=5),
+        ],
+    )
+    async def experiment(
+        self, inter: discord.Interaction, first_colour: app_commands.Choice[int], second_colour: app_commands.Choice[int]
+    ) -> discord.Message:
+        await inter.response.defer()
+        match (first_colour.name, second_colour.name):
+            case ("yellow", "green") | ("green", "yellow"):
+                f = "files/yellowgreen.gif"
+            case ("yellow", "purple") | ("purple", "yellow"):
+                f = "files/yellowpurple.gif"
+            case ("yellow", "cyan") | ("cyan", "yellow"):
+                f = "files/yellowcyan.gif"
+            case ("yellow", "blue") | ("blue", "yellow"):
+                f = "files/yellowblu/e.gif"
+            case ("green", "purple") | ("purple", "green"):
+                f = "files/greenpurple.gif"
+            case ("green", "blue") | ("blue", "green"):
+                f = "files/greenblue.gif"
+            case ("green", "cyan") | ("cyan", "green"):
+                f = "files/greencyan.gif"
+            case ("purple", "blue") | ("blue", "purple"):
+                f = "files/purpleblue.gif"
+            case ("purple", "cyan") | ("cyan", "purple"):
+                f = "files/cyanpurple.gif"
+            case ("blue", "cyan") | ("cyan", "blue"):
+                f = "files/cyanblue.gif"
+            case (_,_):
+                return await inter.followup.send("Invalid colour choices - must be one of 'purple', 'cyan', 'blue', 'green', 'yellow', must not be equal to each other", ephemeral=True)
+        return await inter.followup.send(file=discord.File(f))
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(BenCommands(bot))
