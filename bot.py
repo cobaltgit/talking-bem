@@ -15,10 +15,9 @@ async def ben_answer(inter: discord.Interaction, message: discord.Message) -> di
     """Get a randomised answer from Ben"""
     await inter.response.defer()
     resp = choice(tuple(BenPhoneResponses))
-    msg = await inter.followup.send(
+    return await inter.followup.send(
         f"> [{message.author}] {message.content}\n{resp.value[0]}", file=discord.File(resp.value[1])
     )
-    return await msg.edit(suppress=True)
 
 
 class Ben(commands.AutoShardedBot):
