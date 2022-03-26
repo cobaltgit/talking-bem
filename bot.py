@@ -10,7 +10,7 @@ from cogs.commands import BenPhoneResponses
 
 
 # Context menu commands cannot be within classes
-@app_commands.context_menu(name="Ben's Response")
+@app_commands.context_menu(name="Ben Response")
 async def ben_answer(inter: discord.Interaction, message: discord.Message) -> discord.Message:
     """Get a randomised answer from Ben"""
     await inter.response.defer()
