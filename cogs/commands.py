@@ -96,25 +96,25 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.describe(second_colour="The second colour to use")
     @app_commands.choices(
         first_colour=[
-            app_commands.Choice(name="yellow", value=1),
-            app_commands.Choice(name="green", value=2),
-            app_commands.Choice(name="cyan", value=3),
-            app_commands.Choice(name="purple", value=4),
-            app_commands.Choice(name="blue", value=5),
+            app_commands.Choice(name="Yellow", value=1),
+            app_commands.Choice(name="Green", value=2),
+            app_commands.Choice(name="Cyan", value=3),
+            app_commands.Choice(name="Purple", value=4),
+            app_commands.Choice(name="Blue", value=5),
         ],
         second_colour=[
-            app_commands.Choice(name="yellow", value=1),
-            app_commands.Choice(name="green", value=2),
-            app_commands.Choice(name="cyan", value=3),
-            app_commands.Choice(name="purple", value=4),
-            app_commands.Choice(name="blue", value=5),
+            app_commands.Choice(name="Yellow", value=1),
+            app_commands.Choice(name="Green", value=2),
+            app_commands.Choice(name="Cyan", value=3),
+            app_commands.Choice(name="Purple", value=4),
+            app_commands.Choice(name="Blue", value=5),
         ],
     )
     async def experiment(
         self, inter: discord.Interaction, first_colour: app_commands.Choice[int], second_colour: app_commands.Choice[int]
     ) -> discord.Message:
         await inter.response.defer()
-        match (first_colour.name, second_colour.name):
+        match (first_colour.name.lower(), second_colour.name.lower()):
             case ("yellow", "green") | ("green", "yellow"):
                 f = "files/yellowgreen.gif"
             case ("yellow", "purple") | ("purple", "yellow"):
@@ -138,6 +138,11 @@ class BenCommands(commands.Cog, name="Commands"):
             case (_,_):
                 return await inter.followup.send("Invalid colour choices - must be one of 'purple', 'cyan', 'blue', 'green', 'yellow', must not be equal to each other", ephemeral=True)
         return await inter.followup.send(file=discord.File(f))
+    
+    @app_commands.command(name="repeat", description="Ben will repeat what you say")
+    @app_commands.describe(speech="What would you like Ben to say?")
+    async def repeat(self, inter: discord.Interaction, *, speech: str) -> discord.Message:
+        return await inter.response.send_message(speech)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(BenCommands(bot))
