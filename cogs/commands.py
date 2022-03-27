@@ -44,7 +44,9 @@ class BenCommands(commands.Cog, name="Commands"):
             if scope == "dm" and inter.user
             else None
         ):
-            raise app_commands.CommandError("Failed to determine send method for testing messages") from ValueError("Scope must be one of 'dm', 'guild'")
+            raise app_commands.CommandError("Failed to determine send method for testing messages") from ValueError(
+                "Scope must be one of 'dm', 'guild'"
+            )
         try:
             await send_method(" ")
         except discord.errors.Forbidden:  # Messages not working
@@ -209,6 +211,13 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.describe(speech="What would you like Ben to say?")
     async def repeat(self, inter: discord.Interaction, *, speech: str) -> discord.Message:
         return await inter.response.send_message(speech)
+
+    @app_commands.command(name="discord", description="Get an invite to the bot's support server")
+    async def discord_invite(self, inter: discord.Interaction) -> discord.Message:
+        return await inter.response.send_message(
+            f"https://discord.gg/{dsc}" if (dsc := self.bot.config.get("support_discord")) else "No support server invite found"
+        )
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(BenCommands(bot))
