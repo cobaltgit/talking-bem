@@ -18,7 +18,7 @@ class ErrorHandler(commands.Cog):
         elif isinstance(error, (commands.CheckFailure, app_commands.CheckFailure)):
             return await ctx.send("Check failure: you lack necessary permissions to run this command!")
         else:
-            return await ctx.send("An error occured!", file=discord.File(StringIO(str(error)), filename="err.py"))
+            raise error
 
 
 def setup(bot: commands.Bot) -> None:
