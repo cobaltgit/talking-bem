@@ -3,7 +3,6 @@ FROM ${BASE_IMG} AS base
 
 ENV APPLICATION_ID=
 ENV TOKEN=
-ENV SUPPORT_DISCORD=
 
 RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/* && \
     groupadd ben && useradd -md /app -g ben -s /bin/bash ben

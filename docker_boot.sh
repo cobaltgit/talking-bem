@@ -6,6 +6,6 @@ fi
 
 cd "$(dirname "$0")"
 
-echo "{\"token\": \"$TOKEN\", \"application_id\": $APPLICATION_ID, \"support_discord\": \"$SUPPORT_DISCORD\"}" > config.json
+echo "{\"token\": \"$TOKEN\", \"application_id\": $APPLICATION_ID}" > config.json
 
 exec "$@"
