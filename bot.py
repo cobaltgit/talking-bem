@@ -29,6 +29,7 @@ class Ben(commands.AutoShardedBot):
             command_prefix="ben ",
             application_id=self.config["application_id"],
             help_command=None,
+            chunk_guilds_on_startup=False
         )
         self.tree.add_command(ben_answer)
 
