@@ -1,40 +1,56 @@
 name: Build multiarch Docker image
 
 on:
+  pull_request:
+    branches: master
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: master
 
 jobs:
-  build:
+  buildx:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      -
+        name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3
+      -
+        name: Cache Docker layers
+        uses: actions/cache@v2
+        id: cache
         with:
-          platforms: linux/amd64,linux/arm/v6
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to Docker Hub
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      -
+        name: Docker Buildx (build)
+        run: |
+          docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache" \
+            --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+            --output "type=image,push=false" \
+            --tag cobaltdocker/talking-ben-bot:latest \
+            --file ./Dockerfile ./
+      -
+        name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          platforms: linux/amd64,linux/arm64/v8,linux/386,linux/ppc64le,linux/s390x
-          push: true
-          tags: cobaltdocker/talking-ben-bot:latest
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      -
+        name: Docker Buildx (push)
+        run: |
+          docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+            --output "type=image,push=true" \
+            --tag cobaltdocker/talking-ben-bot:latest \
+            --file ./Dockerfile ./
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect cobaltdocker/talking-ben-bot:latest
