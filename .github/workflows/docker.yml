@@ -3,9 +3,6 @@ name: Build multiarch Docker image
 on:
   push:
     branches: main
-  paths:
-    - "!**.md"
-    - "!LICENSE"
 
 jobs:
   buildx:
