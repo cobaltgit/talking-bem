@@ -4,7 +4,7 @@ on:
   push:
     branches: main
   paths-ignore:
-    - "README.rst"
+    - "README.md"
     - "LICENSE"
 
 jobs:
