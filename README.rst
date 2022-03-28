@@ -28,8 +28,9 @@ Installation is easy! Just follow the below instructions
 Running the Bot
 ---------------
 
-**Ensure you have a Discord Developer API application and bot token ready: Instructions can be found `here
-<https://discordpy.readthedocs.io/en/latest/discord.html>`_.**
+.. _here: https://discordpy.readthedocs.io/en/latest/discord.html
+
+**Ensure you have a Discord Developer API application and bot token ready: Instructions can be found here_.**
 
 * Create a config.json file with the following contents
 
