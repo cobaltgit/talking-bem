@@ -32,7 +32,7 @@ Ensure you have a Discord Developer API application and bot token ready: Instruc
 
 ``` json
 {
-    "token": "bot-token-here
+    "token": "bot-token-here"
     "application_id": 123456789876543210
 }
 ```
