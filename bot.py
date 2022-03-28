@@ -1,6 +1,4 @@
-import asyncio
 import json
-import sys
 from random import choice
 
 import discord
@@ -9,8 +7,6 @@ from discord.ext import commands
 
 from cogs.commands import BenPhoneResponses
 
-if sys.version_info < (3,10):
-    raise RuntimeError("Python 3.10 or higher is required to use this bot")
 
 # Context menu commands cannot be within classes
 @app_commands.context_menu(name="Ben Response")
@@ -32,7 +28,7 @@ class Ben(commands.AutoShardedBot):
             command_prefix="ben ",
             application_id=self.config["application_id"],
             help_command=None,
-            chunk_guilds_on_startup=False
+            chunk_guilds_on_startup=False,
         )
         self.tree.add_command(ben_answer)
 
@@ -49,11 +45,3 @@ class Ben(commands.AutoShardedBot):
         """End all calls on guild leave"""
         for chn in guild.channels:
             self.calling.pop(chn.id, None)
-
-
-async def boot() -> None:
-    async with Ben() as bot:
-        return await bot.start(bot.config.get("token"))
-
-
-asyncio.run(boot())

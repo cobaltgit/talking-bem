@@ -16,5 +16,5 @@ autoflake = "*"
 python_version = "3.10"
 
 [scripts]
-start = "python3.10 bot.py"
+start = "python3.10 boot.py"
 format = "sh -c 'black --target-version py310 --line-length 128 . && isort . && autoflake .'"
