@@ -1,13 +1,16 @@
 import asyncio
 import json
+import sys
 from random import choice
 
 import discord
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 from cogs.commands import BenPhoneResponses
 
+if sys.version_info < (3,10):
+    raise RuntimeError("Python 3.10 or higher is required to use this bot")
 
 # Context menu commands cannot be within classes
 @app_commands.context_menu(name="Ben Response")
