@@ -4,7 +4,7 @@ FROM ${BASE_IMG} AS base
 ENV APPLICATION_ID=
 ENV TOKEN=
 
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/* && \
+RUN apt-get update && apt-get install -y --no-install-recommends git gcc && rm -rf /var/lib/apt/lists/* && \
     groupadd ben && useradd -md /app -g ben -s /bin/bash ben
 USER ben
 
