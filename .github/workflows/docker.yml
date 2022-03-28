@@ -3,9 +3,9 @@ name: Build multiarch Docker image
 on:
   push:
     branches: main
-  paths-ignore:
-    - "README.md"
-    - "LICENSE"
+  paths:
+    - "!**.md"
+    - "!LICENSE"
 
 jobs:
   buildx:
