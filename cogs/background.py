@@ -9,7 +9,7 @@ class BackgroundTasks(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.presences = cycle([
-            f"Taking calls in {len(self.bot.guilds)} guilds", 
+            f"Taking calls in {len(bot.guilds)} guilds", 
             "Vote me on top.gg! https://top.gg/bot/955078353700937778", 
             "Source code: https://github.com/cobaltgit/talking-ben"
         ])
