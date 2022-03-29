@@ -21,6 +21,7 @@ class BackgroundTasks(commands.Cog):
 
     @tasks.loop(seconds=30)
     async def update_presence(self) -> None:
+        await self.bot.wait_until_ready()
         await self.bot.change_presence(
             activity=discord.Activity(name=next(self.presences), type=discord.ActivityType.watching)
         )
