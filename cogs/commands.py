@@ -204,7 +204,7 @@ class BenCommands(commands.Cog, name="Commands"):
             case ("yellow", "cyan") | ("cyan", "yellow"):
                 f = "yellowcyan.gif"
             case ("yellow", "blue") | ("blue", "yellow"):
-                f = "files/yellowblue.gif"
+                f = "yellowblue.gif"
             case ("green", "purple") | ("purple", "green"):
                 f = "greenpurple.gif"
             case ("green", "blue") | ("blue", "green"):
