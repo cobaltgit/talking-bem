@@ -2,6 +2,7 @@
 
 if [[ -v "${TOKEN}" ]] || [[ -v "${APPLICATION_ID}}" ]]; then
     echo "ERROR: TOKEN and APPLICATION_ID are mandatory environment variables that must have a set value."
+    exit 1
 fi
 
 cd "$(dirname "$0")"
