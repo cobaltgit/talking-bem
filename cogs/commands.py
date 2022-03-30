@@ -141,7 +141,9 @@ class BenCommands(commands.Cog, name="Commands"):
                     break
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.channel.id, None)
-                    return await msg.reply("https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif")
+                    return await msg.reply(
+                        "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif"
+                    )
                 resp, gif = choice(tuple(BenPhoneResponses)).value
                 await msg.reply(
                     f"{resp}\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{gif}"
@@ -253,6 +255,19 @@ class BenCommands(commands.Cog, name="Commands"):
     async def shoot(self, inter: discord.Interaction) -> discord.Message:
         return await inter.response.send_message(
             f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{choice['dartgun', 'dartgun_2']}.gif"
+        )
+
+    @app_commands.command(name="chair", description="Make Tom or Ben fall off their chair!")
+    @app_commands.choices(
+        who=[
+            app_commands.Choice(name="Tom", value=1),
+            app_commands.Choice(name="Ben", value=2),
+        ]
+    )
+    @app_commands.describe(who="Who should fall off?")
+    async def chair(self, inter: discord.Interaction, who: app_commands.Choice[int]):
+        return await inter.response.send_message(
+            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-chair_{who.name.lower()}.gif"
         )
 
 
