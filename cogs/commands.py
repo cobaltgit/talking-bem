@@ -248,13 +248,13 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.command(name="punch", description="Punch Tom")
     async def punch(self, inter: discord.Interaction) -> discord.Message:
         return await inter.response.send_message(
-            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-punch.gif"
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingbenpunch.gif"
         )
 
     @app_commands.command(name="shoot", description="Shoot Tom with a suction dart gun")
     async def shoot(self, inter: discord.Interaction) -> discord.Message:
         return await inter.response.send_message(
-            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{choice['dartgun', 'dartgun_2']}.gif"
+            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben{choice(['dartgun', 'dartgun_2'])}.gif"
         )
 
     @app_commands.command(name="chair", description="Make Tom or Ben fall off their chair!")
