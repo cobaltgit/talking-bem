@@ -12,10 +12,10 @@ from discord.ext import commands
 class BenPhoneResponses(Enum):
     """Randomised phone responses in ["answer", "gif path"] format"""
 
-    yes = ["\U0000260E *Yes?*", "files/yes.gif"]
-    no = ["\U0000260E *No.*", "files/no.gif"]
-    ugh = ["\U0000260E *Ugh.*", "files/ugh.gif"]
-    hohoho = ["\U0000260E *Ho ho ho...*", "files/hohoho.gif"]
+    yes = ["\U0000260E *Yes?*", "yes.gif"]
+    no = ["\U0000260E *No.*", "no.gif"]
+    ugh = ["\U0000260E *Ugh.*", "ugh.gif"]
+    hohoho = ["\U0000260E *Ho ho ho...*", "hohoho.gif"]
 
 
 class BenCommands(commands.Cog, name="Commands"):
@@ -71,7 +71,9 @@ class BenCommands(commands.Cog, name="Commands"):
                 )
 
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
-        await inter.user.send("\U0000260E *Ben?*", file=discord.File("files/pickup.gif"))
+        await inter.user.send(
+            "\U0000260E *Ben?*\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-pickup.gif"
+        )
         self.bot.calling[inter.user.id] = True
         while True:
             try:
@@ -81,16 +83,22 @@ class BenCommands(commands.Cog, name="Commands"):
             except asyncio.TimeoutError:
                 self.bot.calling.pop(inter.user.id, None)
                 with suppress(discord.errors.Forbidden):
-                    return await inter.user.send(file=discord.File("files/hangup.gif"))
+                    return await inter.user.send(
+                        "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif"
+                    )
 
             try:
                 if msg.author == self.bot.user or not self.bot.calling.get(inter.user.id):
                     break
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.user.id, None)
-                    return await msg.reply(file=discord.File("files/hangup.gif"))
-                resp = choice(tuple(BenPhoneResponses))
-                await msg.reply(resp.value[0], file=discord.File(resp.value[1]))
+                    return await msg.reply(
+                        "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif"
+                    )
+                resp, gif = choice(tuple(BenPhoneResponses)).value
+                await msg.reply(
+                    f"{resp}\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{gif}.gif"
+                )
             except discord.errors.Forbidden:
                 self.bot.calling.pop(inter.user.id, None)
 
@@ -114,7 +122,9 @@ class BenCommands(commands.Cog, name="Commands"):
         if self.bot.calling.get(inter.channel.id):
             return await inter.followup.send("\U0000260E There is already a call in this channel", ephemeral=True)
 
-        await inter.followup.send("\U0000260E *Ben?*", file=discord.File("files/pickup.gif"))
+        await inter.followup.send(
+            "\U0000260E *Ben?*\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-pickup.gif"
+        )
         self.bot.calling[inter.channel.id] = True
 
         while True:
@@ -122,39 +132,47 @@ class BenCommands(commands.Cog, name="Commands"):
                 msg = await self.bot.wait_for("message", check=lambda m: m.channel == inter.channel, timeout=30.0)
             except asyncio.TimeoutError:
                 self.bot.calling.pop(inter.channel.id, None)
-                return await inter.followup.send(file=discord.File("files/hangup.gif"))
+                return await inter.followup.send(
+                    "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif"
+                )
 
             try:
                 if msg.author == self.bot.user or not self.bot.calling.get(inter.channel.id):
                     break
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.channel.id, None)
-                    return await msg.reply(file=discord.File("files/hangup.gif"))
-                resp = choice(tuple(BenPhoneResponses))
-                await msg.reply(resp.value[0], file=discord.File(resp.value[1]))
+                    return await msg.reply("https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif")
+                resp, gif = choice(tuple(BenPhoneResponses)).value
+                await msg.reply(
+                    f"{resp}\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{gif}"
+                )
             except discord.errors.Forbidden:
                 self.bot.calling.pop(inter.channel.id, None)
 
     @app_commands.command(name="end", description="End the current call")
     async def end(self, inter: discord.Interaction) -> discord.Message:
         self.bot.calling.pop(inter.channel.id if inter.guild else inter.user.id, None)
-        await inter.response.defer()
-        return await inter.followup.send(file=discord.File("files/hangup.gif"))
+        return await inter.response.send_message(
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-hangup.gif"
+        )
 
     @app_commands.command(name="drink", description="Drink some apple cider")
     async def drink(self, inter: discord.Interaction) -> discord.Message:
-        await inter.response.defer()
-        await inter.followup.send(file=discord.File("files/drink.gif"))
+        return await inter.response.send_message(
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-drink.gif"
+        )
 
     @app_commands.command(name="beans", description="Eat some beans")
     async def beans(self, inter: discord.Interaction) -> discord.Message:
-        await inter.response.defer()
-        await inter.followup.send(file=discord.File("files/beans.gif"))
+        return await inter.response.send_message(
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-beans.gif"
+        )
 
     @app_commands.command(name="burp", description="Make Ben burp")
     async def burp(self, inter: discord.Interaction) -> discord.Message:
-        await inter.response.defer()
-        await inter.followup.send(file=discord.File("files/burp.gif"))
+        return await inter.response.send_message(
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-burp.gif"
+        )
 
     @app_commands.command(name="experiment", description="Experiment with different potion combinations!")
     @app_commands.describe(first_colour="The first colour to use")
@@ -178,34 +196,35 @@ class BenCommands(commands.Cog, name="Commands"):
     async def experiment(
         self, inter: discord.Interaction, first_colour: app_commands.Choice[int], second_colour: app_commands.Choice[int]
     ) -> discord.Message:
-        await inter.response.defer()
         match (first_colour.name.lower(), second_colour.name.lower()):
             case ("yellow", "green") | ("green", "yellow"):
-                f = "files/yellowgreen.gif"
+                f = "yellowgreen.gif"
             case ("yellow", "purple") | ("purple", "yellow"):
-                f = "files/yellowpurple.gif"
+                f = "yellowpurple.gif"
             case ("yellow", "cyan") | ("cyan", "yellow"):
-                f = "files/yellowcyan.gif"
+                f = "yellowcyan.gif"
             case ("yellow", "blue") | ("blue", "yellow"):
                 f = "files/yellowblue.gif"
             case ("green", "purple") | ("purple", "green"):
-                f = "files/greenpurple.gif"
+                f = "greenpurple.gif"
             case ("green", "blue") | ("blue", "green"):
-                f = "files/greenblue.gif"
+                f = "greenblue.gif"
             case ("green", "cyan") | ("cyan", "green"):
-                f = "files/greencyan.gif"
+                f = "greencyan.gif"
             case ("purple", "blue") | ("blue", "purple"):
-                f = "files/purpleblue.gif"
+                f = "purpleblue.gif"
             case ("purple", "cyan") | ("cyan", "purple"):
-                f = "files/cyanpurple.gif"
+                f = "cyanpurple.gif"
             case ("blue", "cyan") | ("cyan", "blue"):
-                f = "files/cyanblue.gif"
+                f = "cyanblue.gif"
             case (_, _):
-                return await inter.followup.send(
+                return await inter.response.send_message(
                     "Invalid colour choices - must be one of 'purple', 'cyan', 'blue', 'green', 'yellow', must not be equal to each other",
                     ephemeral=True,
                 )
-        return await inter.followup.send(file=discord.File(f))
+        return await inter.response.send_message(
+            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{f}"
+        )
 
     @app_commands.command(name="repeat", description="Ben will repeat what you say")
     @app_commands.describe(speech="What would you like Ben to say?")
@@ -216,6 +235,24 @@ class BenCommands(commands.Cog, name="Commands"):
     async def discord_invite(self, inter: discord.Interaction) -> discord.Message:
         return await inter.response.send_message(
             f"https://discord.gg/{dsc}" if (dsc := self.bot.config.get("support_discord")) else "No support server invite found"
+        )
+
+    @app_commands.command(name="fight", description="Fight Tom")
+    async def fight(self, inter: discord.Interaction) -> discord.Message:
+        return await inter.response.send_message(
+            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{choice(['news_fight', 'news_fight2'])}.gif"
+        )
+
+    @app_commands.command(name="punch", description="Punch Tom")
+    async def punch(self, inter: discord.Interaction) -> discord.Message:
+        return await inter.response.send_message(
+            "https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-punch.gif"
+        )
+
+    @app_commands.command(name="shoot", description="Shoot Tom with a suction dart gun")
+    async def shoot(self, inter: discord.Interaction) -> discord.Message:
+        return await inter.response.send_message(
+            f"https://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{choice['dartgun', 'dartgun_2']}.gif"
         )
 
 
