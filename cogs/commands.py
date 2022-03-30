@@ -97,7 +97,7 @@ class BenCommands(commands.Cog, name="Commands"):
                     )
                 resp, gif = choice(tuple(BenPhoneResponses)).value
                 await msg.reply(
-                    f"{resp}\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{gif}.gif"
+                    f"{resp}\nhttps://objectstorage.uk-cardiff-1.oraclecloud.com/n/axfzjalldweh/b/cobalt-static-bkt/o/talkingben-{gif}"
                 )
             except discord.errors.Forbidden:
                 self.bot.calling.pop(inter.user.id, None)
