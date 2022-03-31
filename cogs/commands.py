@@ -32,6 +32,8 @@ class BenCommands(commands.Cog, name="Commands"):
         if self.bot.calling.get(inter.user.id):
             return await inter.response.send_message("\U0000260E There is already a call in this DM", ephemeral=True)
 
+        await inter.response.defer()
+        
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
         await inter.user.send(
             f"\U0000260E *Ben?*\n{self.FILE_URL}/pickup.gif"
@@ -68,11 +70,13 @@ class BenCommands(commands.Cog, name="Commands"):
     async def call(self, inter: discord.Interaction) -> discord.Message:
 
         if not inter.guild:
-            return await inter.followup.send("\U0000260E Run the /dmcall command to start a call in DMs", ephemeral=True)
+            return await inter.response.send_message("\U0000260E Run the /dmcall command to start a call in DMs", ephemeral=True)
 
         if self.bot.calling.get(inter.channel.id):
-            return await inter.followup.send("\U0000260E There is already a call in this channel", ephemeral=True)
+            return await inter.response.send_message("\U0000260E There is already a call in this channel", ephemeral=True)
 
+        await inter.response.defer()
+        
         await inter.followup.send(
             f"\U0000260E *Ben?*\n{self.FILE_URL}/pickup.gif"
         )
