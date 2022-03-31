@@ -25,51 +25,12 @@ class BenCommands(commands.Cog, name="Commands"):
         self.bot = bot
         self.bot.calling = {}
         self.FILE_URL = "https://static.cobaltonline.net/talking-ben"
-
-    async def test_messages(self, inter: discord.Interaction, *, scope: Literal["guild", "dm"] = "guild") -> bool:
-        """Test if messages are working properly in either guild or DMs
-
-        Args:
-            inter (discord.Interaction): The command interaction to use
-            scope (Literal["guild", "dm"], optional): Whether to check guild or direct messages. Defaults to "guild".
-
-        Returns:
-            bool: Returns True if messages work in the given scope
-        """
-        await inter.response.defer()
-
-        if not (
-            send_method := inter.followup.send
-            if scope == "guild" and inter.guild
-            else inter.user.send
-            if scope == "dm" and inter.user
-            else None
-        ):
-            raise app_commands.AppCommandError("Failed to determine send method for testing messages") from ValueError(
-                "Scope must be one of 'dm', 'guild'"
-            )
-        try:
-            await send_method(" ")
-        except discord.errors.Forbidden:  # Messages not working
-            return False
-        except discord.errors.HTTPException:  # Messages work
-            return True
-
+        
     @app_commands.command(name="dmcall", description="Start a call with Ben in DMs")
     async def dmcall(self, inter: discord.Interaction) -> discord.Message:
 
         if self.bot.calling.get(inter.user.id):
             return await inter.response.send_message("\U0000260E There is already a call in this DM", ephemeral=True)
-
-        if not await self.test_messages(inter, scope="dm"):
-            if inter.guild and await self.test_messages(inter, scope="guild"):
-                return await inter.followup.send(
-                    "\U0000260E I cannot send you DMs. Please check your privacy settings.", ephemeral=True
-                )
-            else:
-                raise app_commands.CommandError(
-                    f"I cannot send messages to your DMs or in guild '{inter.guild.name}'. Please check my guild permissions or your privacy settings."
-                )
 
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
         await inter.user.send(
@@ -105,17 +66,6 @@ class BenCommands(commands.Cog, name="Commands"):
 
     @app_commands.command(name="call", description="Start a phone call with Ben in your server")
     async def call(self, inter: discord.Interaction) -> discord.Message:
-
-        if not await self.test_messages(inter, scope="guild"):
-            if await self.test_messages(inter, scope="dm"):
-                return await inter.user.send(
-                    f"\U0000260E I cannot send messages in guild '{inter.guild.name}' - please check my permissions",
-                    ephemeral=True,
-                )
-            else:
-                raise app_commands.CommandError(
-                    f"I cannot send messages to your DMs or in guild '{inter.guild.name}'. Please check my guild permissions or your privacy settings."
-                )
 
         if not inter.guild:
             return await inter.followup.send("\U0000260E Run the /dmcall command to start a call in DMs", ephemeral=True)
