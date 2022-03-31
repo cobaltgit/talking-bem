@@ -45,7 +45,7 @@ class BenCommands(commands.Cog, name="Commands"):
             if scope == "dm" and inter.user
             else None
         ):
-            raise app_commands.CommandError("Failed to determine send method for testing messages") from ValueError(
+            raise app_commands.AppCommandError("Failed to determine send method for testing messages") from ValueError(
                 "Scope must be one of 'dm', 'guild'"
             )
         try:
