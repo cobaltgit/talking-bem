@@ -38,7 +38,7 @@ class BenCommands(commands.Cog, name="Commands"):
             try:
                 msg = await self.bot.wait_for(
                     "message",
-                    check=lambda m: m.author != self.bot.user,
+                    check=lambda m: m.author != self.bot.user and m.channel == inter.channel,
                     timeout=20,
                 )
             except asyncio.TimeoutError:
