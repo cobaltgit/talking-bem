@@ -33,7 +33,7 @@ class BenCommands(commands.Cog, name="Commands"):
         await inter.response.defer()
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
         self.bot.calling[inter.channel.id] = True
-        await inter.followup.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
+        await inter.user.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
         while True:
             try:
                 msg = await self.bot.wait_for(
