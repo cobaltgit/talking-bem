@@ -7,15 +7,13 @@ from discord.ext import commands
 
 from cogs.commands import BenPhoneResponses
 
-FILE_URL = "https://static.cobaltonline.net/talking-ben"
-
 # Context menu commands cannot be within classes
 @app_commands.context_menu(name="Ben Response")
 async def ben_answer(inter: discord.Interaction, message: discord.Message) -> discord.Message:
     """Get a randomised answer from Ben"""
     resp, gif = choice(tuple(BenPhoneResponses)).value
     return await inter.response.send_message(
-        f"> [{message.author}] {message.content}\n{resp}\n{FILE_URL}/{gif}"
+        f"> [{message.author}] {message.content}\n{resp}\n{inter.client.FILE_URL}/{gif}"
     )
 
 
@@ -32,7 +30,7 @@ class Ben(commands.AutoShardedBot):
         )
         self.tree.add_command(ben_answer)
         self.calling = {}
-        self.FILE_URL = FILE_URL
+        self.FILE_URL = "https://static.cobaltonline.net/talking-ben"
 
     async def setup_hook(self) -> None:
         await self.load_extension("cogs.commands")
