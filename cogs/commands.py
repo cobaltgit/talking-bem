@@ -32,7 +32,7 @@ class BenCommands(commands.Cog, name="Commands"):
 
         await inter.response.defer()
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
-        self.bot.calling[inter.channel.id] = True
+        self.bot.calling[inter.userl.id] = True
         await inter.user.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
         while True:
             try:
@@ -42,14 +42,14 @@ class BenCommands(commands.Cog, name="Commands"):
                     timeout=20,
                 )
             except asyncio.TimeoutError:
-                self.bot.calling.pop(inter.channel.id, None)
+                self.bot.calling.pop(inter.user.id, None)
                 return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
 
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
-            if self.bot.calling.get(inter.channel.id):
+            if self.bot.calling.get(inter.user.id):
                 if randint(1, 15) == 15:
-                    self.bot.calling.pop(inter.channel.id, None)
+                    self.bot.calling.pop(inter.user.id, None)
                     return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
                 await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
             else:
