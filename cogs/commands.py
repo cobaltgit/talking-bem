@@ -24,10 +24,6 @@ class BenCommands(commands.Cog, name="Commands"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    async def end_call(self, channel: discord.TextChannel | discord.User = None) -> int:
-        await channel.send(f"{self.bot.FILE_URL}/hangup.gif")
-        return self.bot.calling.pop(channel.id, None)
-
     @app_commands.command(name="dmcall", description="Start a call with Ben in DMs")
     async def dmcall(self, inter: discord.Interaction) -> discord.Message:
 
@@ -46,13 +42,15 @@ class BenCommands(commands.Cog, name="Commands"):
                     timeout=20,
                 )
             except asyncio.TimeoutError:
-                return await self.end_call(inter.user)
+                self.bot.calling.pop(inter.channel.id, None)
+                return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
 
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
             if self.bot.calling.get(inter.channel.id):
                 if randint(1, 15) == 15:
-                    return await self.end_call(inter.user)
+                    self.bot.calling.pop(inter.channel.id, None)
+                    return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
                 await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
             else:
                 break
@@ -77,20 +75,30 @@ class BenCommands(commands.Cog, name="Commands"):
                     timeout=20,
                 )
             except asyncio.TimeoutError:
-                return await self.end_call(inter.channel)
+                self.bot.calling.pop(inter.channel.id, None)
+                return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
 
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
             if self.bot.calling.get(inter.channel.id):
                 if randint(1, 15) == 15:
-                    return await self.end_call(inter.channel)
+                    self.bot.calling.pop(inter.channel.id, None)
+                    return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
                 await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
             else:
                 break
 
     @app_commands.command(name="end", description="End the current call")
     async def end(self, inter: discord.Interaction) -> discord.Message:
-        return await self.end_call(inter.channel if inter.guild else inter.user)
+        return (
+            await inter.response.send_message(f"{self.bot.FILE_URL}/hangup.gif")
+            if self.bot.calling.pop(
+                inter.channel.id if inter.guild else inter.user.id, None
+            )
+            else await inter.response.send_message(
+                "\U0000260E There is no calls currently ongoing in this channel."
+            )
+        )
 
     @app_commands.command(name="drink", description="Drink some apple cider")
     async def drink(self, inter: discord.Interaction) -> discord.Message:
