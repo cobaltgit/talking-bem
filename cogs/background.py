@@ -20,5 +20,6 @@ class BackgroundTasks(commands.Cog):
             activity=discord.Activity(name=f"over {len(self.bot.guilds)} guilds", type=discord.ActivityType.watching)
         )
 
+
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(BackgroundTasks(bot))

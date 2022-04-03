@@ -23,7 +23,11 @@ class BenCommands(commands.Cog, name="Commands"):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        
+
+    async def end_call(self, channel: discord.TextChannel | discord.User = None) -> int:
+        await channel.send(f"{self.bot.FILE_URL}/hangup.gif")
+        return self.bot.calling.pop(channel.id, None)
+
     @app_commands.command(name="dmcall", description="Start a call with Ben in DMs")
     async def dmcall(self, inter: discord.Interaction) -> discord.Message:
 
@@ -31,103 +35,74 @@ class BenCommands(commands.Cog, name="Commands"):
             return await inter.response.send_message("\U0000260E There is already a call in this DM", ephemeral=True)
 
         await inter.response.defer()
-        
         await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
-        await inter.user.send(
-            f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif"
-        )
-        self.bot.calling[inter.user.id] = True
+        self.bot.calling[inter.channel.id] = True
+        await inter.followup.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
         while True:
             try:
                 msg = await self.bot.wait_for(
-                    "message", check=lambda m: isinstance(m.channel, discord.DMChannel) and m.author == inter.user, timeout=30.0
+                    "message",
+                    check=lambda m: m.author != self.bot.user,
+                    timeout=20,
                 )
             except asyncio.TimeoutError:
-                self.bot.calling.pop(inter.user.id, None)
-                with suppress(discord.errors.Forbidden):
-                    return await inter.user.send(
-                        f"{self.bot.FILE_URL}/hangup.gif"
-                    )
+                return await self.end_call(inter.user)
 
-            try:
-                if msg.author == self.bot.user or not self.bot.calling.get(inter.user.id):
-                    break
+            resp, gif = choice(tuple(BenPhoneResponses)).value
+
+            if self.bot.calling.get(inter.channel.id):
                 if randint(1, 15) == 15:
-                    self.bot.calling.pop(inter.user.id, None)
-                    return await msg.reply(
-                        f"{self.bot.FILE_URL}/hangup.gif"
-                    )
-                resp, gif = choice(tuple(BenPhoneResponses)).value
-                await msg.reply(
-                    f"{resp}\n{self.bot.FILE_URL}/{gif}"
-                )
-            except discord.errors.Forbidden:
-                self.bot.calling.pop(inter.user.id, None)
+                    return await self.end_call(inter.user)
+                await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
+            else:
+                break
 
     @app_commands.command(name="call", description="Start a phone call with Ben in your server")
     async def call(self, inter: discord.Interaction) -> discord.Message:
-
         if not inter.guild:
-            return await inter.response.send_message("\U0000260E Run the /dmcall command to start a call in DMs", ephemeral=True)
-
-        if self.bot.calling.get(inter.channel.id):
+            return await inter.response.send_message(
+                "\U0000260E Run the /dmcall command to start a call in DMs", ephemeral=True
+            )
+        elif self.bot.calling.get(inter.channel.id):
             return await inter.response.send_message("\U0000260E There is already a call in this channel", ephemeral=True)
 
         await inter.response.defer()
-        
-        await inter.followup.send(
-            f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif"
-        )
         self.bot.calling[inter.channel.id] = True
-
+        await inter.followup.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
         while True:
             try:
-                msg = await self.bot.wait_for("message", check=lambda m: m.channel == inter.channel, timeout=30.0)
+                msg = await self.bot.wait_for(
+                    "message",
+                    check=lambda m: m.channel == inter.channel and m.author != self.bot.user,
+                    timeout=20,
+                )
             except asyncio.TimeoutError:
-                self.bot.calling.pop(inter.channel.id, None)
-                return await inter.followup.send(
-                    f"{self.bot.FILE_URL}/hangup.gif"
-                )
+                return await self.end_call(inter.channel)
 
-            try:
-                if msg.author == self.bot.user or not self.bot.calling.get(inter.channel.id):
-                    break
+            resp, gif = choice(tuple(BenPhoneResponses)).value
+
+            if self.bot.calling.get(inter.channel.id):
                 if randint(1, 15) == 15:
-                    self.bot.calling.pop(inter.channel.id, None)
-                    return await msg.reply(
-                        f"{self.bot.FILE_URL}/hangup.gif"
-                    )
-                resp, gif = choice(tuple(BenPhoneResponses)).value
-                await msg.reply(
-                    f"{resp}\n{self.bot.FILE_URL}/{gif}"
-                )
-            except discord.errors.Forbidden:
-                self.bot.calling.pop(inter.channel.id, None)
+                    return await self.end_call(inter.channel)
+                await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
+            else:
+                break
 
     @app_commands.command(name="end", description="End the current call")
     async def end(self, inter: discord.Interaction) -> discord.Message:
-        self.bot.calling.pop(inter.channel.id if inter.guild else inter.user.id, None)
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/hangup.gif"
-        )
+        return await self.end_call(inter.channel if inter.guild else inter.user)
 
     @app_commands.command(name="drink", description="Drink some apple cider")
     async def drink(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/drink.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/drink.gif")
 
     @app_commands.command(name="beans", description="Eat some beans")
     async def beans(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/beans.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/beans.gif")
 
     @app_commands.command(name="burp", description="Make Ben burp")
     async def burp(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/burp.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/burp.gif")
 
     @app_commands.command(name="experiment", description="Experiment with different potion combinations!")
     @app_commands.describe(first_colour="The first colour to use")
@@ -177,9 +152,7 @@ class BenCommands(commands.Cog, name="Commands"):
                     "Invalid colour choices - must be one of 'purple', 'cyan', 'blue', 'green', 'yellow', must not be equal to each other",
                     ephemeral=True,
                 )
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/{f}"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/{f}")
 
     @app_commands.command(name="repeat", description="Ben will repeat what you say")
     @app_commands.describe(speech="What would you like Ben to say?")
@@ -194,21 +167,15 @@ class BenCommands(commands.Cog, name="Commands"):
 
     @app_commands.command(name="fight", description="Fight Tom")
     async def fight(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/{choice(['news_fight', 'news_fight2'])}.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/{choice(['news_fight', 'news_fight2'])}.gif")
 
     @app_commands.command(name="punch", description="Punch Tom")
     async def punch(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/punch.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/punch.gif")
 
     @app_commands.command(name="shoot", description="Shoot Tom with a suction dart gun")
     async def shoot(self, inter: discord.Interaction) -> discord.Message:
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/{choice(['dartgun', 'dartgun_2'])}.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/{choice(['dartgun', 'dartgun_2'])}.gif")
 
     @app_commands.command(name="chair", description="Make Tom or Ben fall off their chair!")
     @app_commands.choices(
@@ -219,9 +186,7 @@ class BenCommands(commands.Cog, name="Commands"):
     )
     @app_commands.describe(who="Who should fall off?")
     async def chair(self, inter: discord.Interaction, who: app_commands.Choice[int]):
-        return await inter.response.send_message(
-            f"{self.bot.FILE_URL}/chair_{who.name.lower()}.gif"
-        )
+        return await inter.response.send_message(f"{self.bot.FILE_URL}/chair_{who.name.lower()}.gif")
 
 
 async def setup(bot: commands.Bot) -> None:
