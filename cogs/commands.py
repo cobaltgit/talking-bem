@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 from enum import Enum
 from random import choice, randint
 
@@ -96,10 +97,8 @@ class BenCommands(commands.Cog, name="Commands"):
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.channel.id, None)
                     return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
-                try:
+                with contextlib.suppress(discord.errors.HTTPException):
                     await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
-                except discord.errors.HTTPException:
-                    pass
             else:
                 break
 
