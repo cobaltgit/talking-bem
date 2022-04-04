@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS blacklist(
+    guild_id BIGINT NOT NULL,
+    channel_id BIGINT NOT NULL PRIMARY KEY
+)

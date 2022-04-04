@@ -1,12 +1,20 @@
 import asyncio
-from contextlib import suppress
 from enum import Enum
 from random import choice, randint
-from typing import Literal
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+from itertools import chain
+
+
+def channel_whitelisted():
+    def predicate(inter: discord.Interaction) -> bool:
+        if inter.channel.id in inter.client.blacklist.get(inter.guild.id, []):
+            raise app_commands.CheckFailure("\U0000260E This channel is blacklisted for calls")
+        return True
+
+    return app_commands.check(predicate)
 
 
 class BenPhoneResponses(Enum):
@@ -24,7 +32,10 @@ class BenCommands(commands.Cog, name="Commands"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
+    blacklist = app_commands.Group(name="blacklist", description="Commands for managing blacklisted channels")
+
     @app_commands.command(name="dmcall", description="Start a call with Ben in DMs")
+    @channel_whitelisted()
     async def dmcall(self, inter: discord.Interaction) -> discord.Message:
 
         if self.bot.calling.get(inter.user.id):
@@ -56,6 +67,7 @@ class BenCommands(commands.Cog, name="Commands"):
                 break
 
     @app_commands.command(name="call", description="Start a phone call with Ben in your server")
+    @channel_whitelisted()
     async def call(self, inter: discord.Interaction) -> discord.Message:
         if not inter.guild:
             return await inter.response.send_message(
@@ -89,15 +101,12 @@ class BenCommands(commands.Cog, name="Commands"):
                 break
 
     @app_commands.command(name="end", description="End the current call")
+    @channel_whitelisted()
     async def end(self, inter: discord.Interaction) -> discord.Message:
         return (
             await inter.response.send_message(f"{self.bot.FILE_URL}/hangup.gif")
-            if self.bot.calling.pop(
-                inter.channel.id if inter.guild else inter.user.id, None
-            )
-            else await inter.response.send_message(
-                "\U0000260E There is no calls currently ongoing in this channel."
-            )
+            if self.bot.calling.pop(inter.channel.id if inter.guild else inter.user.id, None)
+            else await inter.response.send_message("\U0000260E There is no calls currently ongoing in this channel.")
         )
 
     @app_commands.command(name="drink", description="Drink some apple cider")
@@ -195,6 +204,43 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.describe(who="Who should fall off?")
     async def chair(self, inter: discord.Interaction, who: app_commands.Choice[int]):
         return await inter.response.send_message(f"{self.bot.FILE_URL}/chair_{who.name.lower()}.gif")
+
+    @blacklist.command(name="add", description="Add a channel to the blacklist")
+    @app_commands.checks.has_permissions(manage_channels=True)
+    async def add(self, inter: discord.Interaction, channel: discord.TextChannel) -> discord.Message:
+        async with self.bot.db.execute("SELECT channel_id FROM blacklist WHERE guild_id = ?", (inter.guild.id,)) as cursor:
+            if channel.id in (await cursor.fetchone() or []):
+                return await inter.response.send_message("This channel is already blacklisted", ephemeral=True)
+        await self.bot.db.execute("INSERT INTO blacklist (guild_id,channel_id) VALUES (?,?)", (inter.guild.id, channel.id))
+        await self.bot.db.commit()
+        self.bot.blacklist[inter.guild.id].append(channel.id)
+        return await inter.response.send_message(f"Blacklisted channel {channel.mention}", ephemeral=True)
+
+    @blacklist.command(name="remove", description="Remove a channel from the blacklist")
+    @app_commands.checks.has_permissions(manage_channels=True)
+    async def remove(self, inter: discord.Interaction, channel: discord.TextChannel) -> discord.Message:
+        async with self.bot.db.execute("SELECT channel_id FROM blacklist WHERE guild_id = ?", (inter.guild.id,)) as cursor:
+            if channel.id not in (list(chain(*await cursor.fetchall())) or []):
+                return await inter.response.send_message("This channel is not blacklisted", ephemeral=True)
+        await self.bot.db.execute("DELETE FROM blacklist WHERE guild_id = ? AND channel_id = ?", (inter.guild.id, channel.id))
+        await self.bot.db.commit()
+        self.bot.blacklist[inter.guild.id].remove(channel.id)
+        return await inter.response.send_message(f"Removed channel {channel.mention} from blacklist", ephemeral=True)
+
+    @blacklist.command(name="list", description="Get a list of blacklisted channels in the server")
+    @app_commands.checks.has_permissions(manage_channels=True)
+    async def _list(self, inter: discord.Interaction) -> discord.Message:
+        if inter.guild and hasattr(inter.guild, "id"):
+            return await inter.response.send_message(
+                "__List of blacklisted channels:__\n{}".format(
+                    "\n".join(map(lambda i: self.bot.get_channel(i).mention, guild_blacklist))
+                )
+                if (guild_blacklist := self.bot.blacklist.get(inter.guild.id))
+                else "There are no blacklisted channels",
+                ephemeral=True,
+            )
+        else:
+            return await inter.response.send_message("Direct messages cannot be blacklisted", ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:
