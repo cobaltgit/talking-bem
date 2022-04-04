@@ -96,7 +96,10 @@ class BenCommands(commands.Cog, name="Commands"):
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.channel.id, None)
                     return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
-                await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
+                try:
+                    await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
+                except discord.errors.HTTPException:
+                    pass
             else:
                 break
 
