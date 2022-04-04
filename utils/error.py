@@ -14,7 +14,7 @@ async def on_app_command_error(
         case app_commands.CommandNotFound:
             return
         case app_commands.MissingPermissions:
-            msg = f"__This command requires the following permissions:__\n**{'\n'.join(i.replace('_', ' ').replace('guild', 'server').title() for i in error.missing_permissions)}**"
+            msg = "__This command requires the following permissions:__\n**{}**".format('\n'.join(i.replace('_', ' ').replace('guild', 'server').title() for i in error.missing_permissions))
         case app_commands.CheckFailure:
             msg = str(error)
             
