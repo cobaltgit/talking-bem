@@ -6,6 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.commands import BenPhoneResponses
+from utils.error import on_app_command_error
 
 
 # Context menu commands cannot be within classes
@@ -32,6 +33,7 @@ class Ben(commands.AutoShardedBot):
         self.FILE_URL = "https://static.cobaltonline.net/talking-ben"
 
     async def setup_hook(self) -> None:
+        self.on_app_command_error = self.tree.error(on_app_command_error)
         await self.load_extension("cogs.commands")
         await self.load_extension("cogs.background")
         await self.load_extension("cogs.owner")
