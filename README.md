@@ -6,7 +6,8 @@ You must have Python 3.10+ installed on your system to use this bot
 
 ## Installation
 
-Installation is easy! Just follow the below instructions
+Personally, I'd rather you not create a public instance of this bot  
+However, for transparency purposes, this source code along with installation instructions have been provided
 
 - Clone this repository into a directory on your machine
 
