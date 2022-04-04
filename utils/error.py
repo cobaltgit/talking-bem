@@ -14,8 +14,8 @@ async def on_app_command_error(
         case app_commands.CommandNotFound:
             return
         case app_commands.MissingPermissions:
-            msg = f"__This command requires the following permissions__\n**{', '.join(error.missing_permissions)}**"
+            msg = f"__This command requires the following permissions__\n**{', '.join(i.replace('_', ' ').replace('guild', 'server') for i in error.missing_permissions)}**"
         case app_commands.CheckFailure:
-            msg = "Required checks to run this command have failed. Perhaps you don't have permission to run it?"
+            msg = str(error)
             
     return await interaction.response.send_message(msg, ephemeral=True)
