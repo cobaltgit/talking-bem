@@ -21,7 +21,6 @@ async def on_app_command_error(interaction: Interaction, command: Union[Command,
             msg = str(error)
         case _:
             f = discord.File(StringIO(traceback.format_exc()), filename="exception.py")
-            await interaction.response.defer()
-            return await interaction.followup.send(file=f, ephemeral=True)
+            return await interaction.response.send_message(file=f, ephemeral=True)
 
     return await interaction.response.send_message(msg, ephemeral=True)
