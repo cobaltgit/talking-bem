@@ -211,7 +211,7 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.checks.has_permissions(manage_channels=True)
     async def add(self, inter: discord.Interaction, channel: discord.TextChannel) -> discord.Message:
         async with self.bot.db.execute("SELECT channel_id FROM blacklist WHERE guild_id = ?", (inter.guild.id,)) as cursor:
-            if channel.id in (await cursor.fetchone() or []):
+            if channel.id in (list(chain(*await cursor.fetchall())) or []):
                 return await inter.response.send_message("This channel is already blacklisted", ephemeral=True)
         await self.bot.db.execute("INSERT INTO blacklist (guild_id,channel_id) VALUES (?,?)", (inter.guild.id, channel.id))
         await self.bot.db.commit()
