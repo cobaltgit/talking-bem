@@ -42,8 +42,7 @@ class BenCommands(commands.Cog, name="Commands"):
         if self.bot.calling.get(inter.user.id):
             return await inter.response.send_message("\U0000260E There is already a call in this DM", ephemeral=True)
 
-        await inter.response.defer()
-        await inter.followup.send(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
+        await inter.response.send_message(f"\U0000260E Started a call in your DMs, {inter.user.mention}", ephemeral=True)
         self.bot.calling[inter.user.id] = True
         await inter.user.send(f"\U0000260E *Ben?*\n{self.bot.FILE_URL}/pickup.gif")
         while True:
