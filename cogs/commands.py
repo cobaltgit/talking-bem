@@ -11,7 +11,8 @@ from itertools import chain
 
 def channel_whitelisted():
     def predicate(inter: discord.Interaction) -> bool:
-        if inter.channel.id in inter.client.blacklist.get(inter.guild.id, []):
+        gid = getattr(inter, "guild.id", None)
+        if inter.channel.id in inter.client.blacklist.get(gid, []):
             raise app_commands.CheckFailure("\U0000260E This channel is blacklisted for calls")
         return True
 
