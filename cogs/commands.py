@@ -36,7 +36,6 @@ class BenCommands(commands.Cog, name="Commands"):
     blacklist = app_commands.Group(name="blacklist", description="Commands for managing blacklisted channels")
 
     @app_commands.command(name="dmcall", description="Start a call with Ben in DMs")
-    @channel_whitelisted()
     async def dmcall(self, inter: discord.Interaction) -> discord.Message:
 
         if self.bot.calling.get(inter.user.id):
@@ -55,14 +54,14 @@ class BenCommands(commands.Cog, name="Commands"):
                 )
             except asyncio.TimeoutError:
                 self.bot.calling.pop(inter.user.id, None)
-                return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
+                return await inter.user.send(f"{self.bot.FILE_URL}/hangup.gif")
 
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
             if self.bot.calling.get(inter.user.id):
                 if randint(1, 15) == 15:
                     self.bot.calling.pop(inter.user.id, None)
-                    return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
+                    return await inter.user.send(f"{self.bot.FILE_URL}/hangup.gif")
                 await msg.reply(f"{resp}\n{self.bot.FILE_URL}/{gif}")
             else:
                 break
