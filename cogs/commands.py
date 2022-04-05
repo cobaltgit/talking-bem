@@ -208,6 +208,7 @@ class BenCommands(commands.Cog, name="Commands"):
         return await inter.response.send_message(f"{self.bot.FILE_URL}/chair_{who.name.lower()}.gif")
 
     @blacklist.command(name="add", description="Add a channel to the blacklist")
+    @app_commands.describe(channel="The channel to add to the blacklist")
     @app_commands.checks.has_permissions(manage_channels=True)
     async def add(self, inter: discord.Interaction, channel: discord.TextChannel) -> discord.Message:
         async with self.bot.db.execute("SELECT channel_id FROM blacklist WHERE guild_id = ?", (inter.guild.id,)) as cursor:
@@ -219,6 +220,7 @@ class BenCommands(commands.Cog, name="Commands"):
         return await inter.response.send_message(f"Blacklisted channel {channel.mention}", ephemeral=True)
 
     @blacklist.command(name="remove", description="Remove a channel from the blacklist")
+    @app_commands.describe(channel="The channel to remove from the blacklist")
     @app_commands.checks.has_permissions(manage_channels=True)
     async def remove(self, inter: discord.Interaction, channel: discord.TextChannel) -> discord.Message:
         async with self.bot.db.execute("SELECT channel_id FROM blacklist WHERE guild_id = ?", (inter.guild.id,)) as cursor:
