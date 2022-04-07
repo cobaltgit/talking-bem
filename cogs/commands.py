@@ -27,6 +27,21 @@ class BenPhoneResponses(Enum):
     ugh = ["\U0000260E *Ugh.*", "ugh.gif"]
     hohoho = ["\U0000260E *Ho ho ho...*", "hohoho.gif"]
 
+class BenNewspaperResponses(Enum):
+    """Randomised newspaper responses in ["answer", "gif path"] format"""
+    taunt = ["\U0001f4f0 *Na-na-na-na.*", "newspaper_taunt.gif"]
+    putdown = ["\U0001f4f0 *puts newspaper down*", "newspaper_putdown.gif"]
+    look = ["\U0001f4f0 ...", "newspaper_look.gif"]
+    shh = ["\U0001f4f0 *Shh...*", "newspaper_shh.gif"]
+    hohoho = ["\U0001f4f0 *Ho ho ho...*", "newspaper_static.png"]
+    hehehe = ["\U0001f4f0 *Hehehe...*", "newspaper_static.png"]
+    hm = ["\U0001f4f0 *H-h-hm...*", "newspaper_static.png"]
+    mhm = ["\U0001f4f0 *Mm-hm...*", "newspaper_static.png"]
+    hmhm = ["\U0001f4f0 *Hm-hm...*", "newspaper_static.png"]
+    sleep = ["\U0001f4f0 \U0001f4a4...", "newspaper_sleep.gif"]
+    
+    
+
 
 class BenCommands(commands.Cog, name="Commands"):
     """Commands for Talking Ben"""
@@ -205,6 +220,11 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.describe(who="Who should fall off?")
     async def chair(self, inter: discord.Interaction, who: app_commands.Choice[int]):
         return await inter.response.send_message(f"{self.bot.FILE_URL}/chair_{who.name.lower()}.gif")
+
+    @app_commands.command(name="newspaper", description="Distract Ben from his newspaper")
+    async def newspaper(self, inter: discord.Interaction) -> discord.Message:
+        resp, gif = choice(tuple(BenNewspaperResponses)).value
+        return await inter.response.send_message(f"{resp}\n{self.bot.FILE_URL}/{gif}")
 
     @blacklist.command(name="add", description="Add a channel to the blacklist")
     @app_commands.describe(channel="The channel to add to the blacklist")
