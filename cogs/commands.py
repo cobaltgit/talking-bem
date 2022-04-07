@@ -233,12 +233,12 @@ class BenCommands(commands.Cog, name="Commands"):
     @blacklist.command(name="list", description="Get a list of blacklisted channels in the server")
     @app_commands.checks.has_permissions(manage_channels=True)
     async def _list(self, inter: discord.Interaction) -> discord.Message:
-        if inter.guild and hasattr(inter.guild, "id"):
+        if gid := getattr(inter, "guild.id", None):
             return await inter.response.send_message(
                 "__List of blacklisted channels:__\n{}".format(
                     "\n".join(map(lambda i: self.bot.get_channel(i).mention, guild_blacklist))
                 )
-                if (guild_blacklist := self.bot.blacklist.get(inter.guild.id))
+                if (guild_blacklist := self.bot.blacklist.get(gid))
                 else "There are no blacklisted channels",
                 ephemeral=True,
             )
