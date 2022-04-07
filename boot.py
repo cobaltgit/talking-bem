@@ -1,13 +1,13 @@
 import sys
-from collections import defaultdict
-from typing import DefaultDict
-
-import aiosqlite
 
 if sys.version_info < (3, 10):
     raise RuntimeError("Python 3.10 or higher is required to use this bot")
 
 import asyncio
+from collections import defaultdict
+from typing import DefaultDict
+
+import aiosqlite
 
 from bot import Ben
 
