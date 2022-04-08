@@ -27,8 +27,10 @@ class BenPhoneResponses(Enum):
     ugh = ["\U0000260E *Ugh.*", "ugh.gif"]
     hohoho = ["\U0000260E *Ho ho ho...*", "hohoho.gif"]
 
+
 class BenNewspaperResponses(Enum):
     """Randomised newspaper responses in ["answer", "gif path"] format"""
+
     taunt = ["\U0001f4f0 *Na-na-na-na.*", "newspaper_taunt.gif"]
     putdown = ["\U0001f4f0 *puts newspaper down*", "newspaper_putdown.gif"]
     look = ["\U0001f4f0 ...", "newspaper_look.gif"]
@@ -39,8 +41,6 @@ class BenNewspaperResponses(Enum):
     mhm = ["\U0001f4f0 *Mm-hm...*", "newspaper_static.png"]
     hmhm = ["\U0001f4f0 *Hm-hm...*", "newspaper_static.png"]
     sleep = ["\U0001f4f0 \U0001f4a4...", "newspaper_sleep.gif"]
-    
-    
 
 
 class BenCommands(commands.Cog, name="Commands"):
@@ -64,13 +64,15 @@ class BenCommands(commands.Cog, name="Commands"):
             try:
                 msg = await self.bot.wait_for(
                     "message",
-                    check=lambda m: m.author != inter.client.user and self.bot.calling.get(m.author.id),
+                    check=lambda m: m.author != inter.client.user,
                     timeout=20,
                 )
             except asyncio.TimeoutError:
-                self.bot.calling.pop(inter.user.id, None)
-                return await inter.user.send(f"{self.bot.FILE_URL}/hangup.gif")
+                if not self.bot.calling.get(inter.user.id):
+                    return
 
+                self.bot.calling.pop(inter.user.id)
+                return await inter.user.send(f"{self.bot.FILE_URL}/hangup.gif")
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
             if self.bot.calling.get(inter.user.id):
@@ -98,13 +100,15 @@ class BenCommands(commands.Cog, name="Commands"):
             try:
                 msg = await self.bot.wait_for(
                     "message",
-                    check=lambda m: m.channel == inter.channel and m.author != self.bot.user and self.bot.calling.get(m.channel.id),
+                    check=lambda m: m.channel == inter.channel and m.author != self.bot.user,
                     timeout=20,
                 )
             except asyncio.TimeoutError:
+                if not self.bot.calling.get(inter.channel.id):
+                    return
+
                 self.bot.calling.pop(inter.channel.id, None)
                 return await inter.followup.send(f"{self.bot.FILE_URL}/hangup.gif")
-
             resp, gif = choice(tuple(BenPhoneResponses)).value
 
             if self.bot.calling.get(inter.channel.id):
