@@ -2,13 +2,14 @@ from PIL import Image, ImageFont, ImageDraw
 import textwrap
 from io import BytesIO
 
-def generate_news(image: BytesIO, text: str = None) -> BytesIO:
+def generate_news(image: BytesIO = None, text: str = None) -> BytesIO:
     IMAGE_BACKGROUND = "files/news_bg.jpg"
     size = 152,85
     with Image.open(IMAGE_BACKGROUND) as bg_img:
         bg = bg_img.copy()
-        with Image.open(image) as fg:
-            fg = fg.resize(size, Image.ANTIALIAS)
+        if image is not None:
+            with Image.open(image) as fg:
+                fg = fg.resize(size, Image.ANTIALIAS)
             bg.paste(fg, (181,156))
         if text is not None:
             draw = ImageDraw.Draw(bg)
