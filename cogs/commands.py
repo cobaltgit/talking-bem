@@ -280,15 +280,14 @@ class BenCommands(commands.Cog, name="Commands"):
     async def news(self, inter: discord.Interaction, image: str = None, *, text: str = None) -> discord.Message:
         
         if not (image or text):
-            return await inter.response.send_message("\U0001f4f0 You must provide an image URL and/or text")
+            return await inter.response.send_message("\U0001f4f0 You must provide an image URL and/or text", ephemeral=True)
         
-        await inter.response.defer()
         if image is not None:
             try:
                 async with self.bot.session.get(image) as r:
                     img_bytes = BytesIO(await r.read())
             except aiohttp.ClientError as e:
-                return await inter.followup.send(f"\U0001f4f0 Unable to fetch image, the bot encountered an error\n`{type(e).__name__}: {e}`", ephemeral=True)
+                return await inter.response.send_message(f"\U0001f4f0 Unable to fetch image, the bot encountered an error\n`{type(e).__name__}: {e}`", ephemeral=True)
         else:
             img_bytes = None
 
@@ -296,8 +295,8 @@ class BenCommands(commands.Cog, name="Commands"):
         try:
             news = await self.bot.loop.run_in_executor(None, fn)
         except UnidentifiedImageError:
-            return await inter.followup.send("\U0001f4f0 Invalid image data, unable to create news", ephemeral=True)
-        return await inter.followup.send(file=discord.File(news, filename="news.png"))
+            return await inter.response.send_message(f"\U0001f4f0 Invalid image data, unable to create news", ephemeral=True)
+        return await inter.response.send_message(file=discord.File(news, filename="news.png"))
         
 
 async def setup(bot: commands.Bot) -> None:
