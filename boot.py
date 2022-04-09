@@ -8,6 +8,7 @@ from collections import defaultdict
 from typing import DefaultDict
 
 import aiosqlite
+import aiohttp
 
 from bot import Ben
 
@@ -21,12 +22,14 @@ async def cache_blacklist(cursor: aiosqlite.Cursor) -> DefaultDict[int, list[int
 
 async def _boot() -> None:
     async with Ben() as bot:
-        async with aiosqlite.connect("db/main.db") as bot.db:
-            with open("db/schema.sql", "r", encoding="utf-8") as schema:
-                await bot.db.executescript(schema.read())
-            async with bot.db.execute("SELECT * FROM blacklist") as cursor:
-                bot.blacklist = await cache_blacklist(cursor)
-            await bot.start(bot.config.get("token"))
+        bot.loop = asyncio.get_event_loop()
+        async with aiohttp.ClientSession(loop=bot.loop) as bot.session:
+            async with aiosqlite.connect("db/main.db") as bot.db:
+                with open("db/schema.sql", "r", encoding="utf-8") as schema:
+                    await bot.db.executescript(schema.read())
+                async with bot.db.execute("SELECT * FROM blacklist") as cursor:
+                    bot.blacklist = await cache_blacklist(cursor)
+                await bot.start(bot.config.get("token"))
 
 
 asyncio.run(_boot())
