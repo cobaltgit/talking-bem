@@ -31,6 +31,7 @@ class BenPhoneResponses(Enum):
     no = ["\U0000260E *No.*", "no.gif"]
     ugh = ["\U0000260E *Ugh.*", "ugh.gif"]
     hohoho = ["\U0000260E *Ho ho ho...*", "hohoho.gif"]
+    uhuh = ["\U0000260E *Uh-uh, uh-huh.*", "unused_uhuh.gif"]
 
 
 class BenNewspaperResponses(Enum):
