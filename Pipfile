@@ -7,6 +7,7 @@ name = "pypi"
 "discord.py" = {git = "https://github.com/Rapptz/discord.py"}
 jishaku = {git = "https://github.com/Gorialis/jishaku"}
 aiosqlite = "*"
+pillow = "*"
 
 [dev-packages]
 black = "*"

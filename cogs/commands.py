@@ -3,10 +3,15 @@ import contextlib
 from enum import Enum
 from itertools import chain
 from random import choice, randint
+from PIL import UnidentifiedImageError
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+from utils.functions import generate_news
+from functools import partial
+from io import BytesIO
+import aiohttp
 
 
 def channel_whitelisted():
@@ -268,7 +273,25 @@ class BenCommands(commands.Cog, name="Commands"):
             )
         else:
             return await inter.response.send_message("Direct messages cannot be blacklisted", ephemeral=True)
+        
+    @app_commands.command(name="news", description="Create a news message")
+    @app_commands.describe(image="The image URL for the news")
+    @app_commands.describe(text="Optional text for the news")
+    async def news(self, inter: discord.Interaction, image: str, *, text: str = None) -> discord.Message:
+        await inter.response.defer()
+        try:
+            async with self.bot.session.get(image) as r:
+                img_bytes = BytesIO(await r.read())
+        except aiohttp.ClientError as e:
+            return await inter.followup.send(f"\U0001f4f0 Unable to fetch image, the bot encountered an error\n`{type(e).__name__}: {e}`", ephemeral=True)
 
+        fn = partial(generate_news, img_bytes, text)
+        try:
+            news = await self.bot.loop.run_in_executor(None, fn)
+        except UnidentifiedImageError:
+            return await inter.followup.send("\U0001f4f0 Invalid image data, unable to create news", ephemeral=True)
+        return await inter.followup.send(file=discord.File(news, filename="news.png"))
+        
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(BenCommands(bot))
