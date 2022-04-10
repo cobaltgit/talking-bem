@@ -205,7 +205,7 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.command(name="discord", description="Get an invite to the bot's support server")
     async def discord_invite(self, inter: discord.Interaction) -> discord.Message:
         return await inter.response.send_message(
-            f"https://discord.gg/{dsc}" if (dsc := self.bot.config.get("support_discord")) else "No support server invite found"
+            "https://discord.gg/cq4VawvptQ"
         )
 
     @app_commands.command(name="fight", description="Fight Tom")
