@@ -302,7 +302,6 @@ class BenCommands(commands.Cog, name="Commands"):
         return await inter.response.send_message(file=discord.File(news, filename="news.png"))
     
     @app_commands.command(name="voice", description="Call with Ben in a voice channel")
-    @app_commands.guilds(discord.Object(id=899238901837881404))
     async def call_voice(self, inter: discord.Interaction) -> discord.Message:
         if inter.user.voice is None or inter.guild is None:
             return await inter.response.send_message("\U0000260E You must be in a server voice channel")
@@ -334,7 +333,6 @@ class BenCommands(commands.Cog, name="Commands"):
         
             
     @app_commands.command(name="endvoice", description="End a call in a voice channel")
-    @app_commands.guilds(discord.Object(id=899238901837881404))
     async def endvoice(self, inter: discord.Interaction) -> discord.Message:
         if inter.guild.voice_client not in self.bot.voice_clients:
             return await inter.response.send_message("\U0000260E I am not connected to a voice channel")
