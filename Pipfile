@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"discord.py" = {git = "https://github.com/Rapptz/discord.py"}
+"discord.py" = {git = "https://github.com/Rapptz/discord.py", extras = ["voice","speedup"]}
 jishaku = {git = "https://github.com/Gorialis/jishaku"}
 aiosqlite = "*"
 pillow = "*"

@@ -10,9 +10,13 @@ class Owner(commands.Cog):
 
     @commands.command(name="synctree")
     @commands.is_owner()
-    async def synctree(self, ctx: commands.Context) -> discord.Message:
+    async def synctree(self, ctx: commands.Context, *guild_ids) -> discord.Message:
         """Sync the application command tree"""
-        await self.bot.tree.sync()
+        if not guild_ids:
+            await self.bot.tree.sync()
+        else:
+            for i in map(int, guild_ids):
+                await self.bot.tree.sync(guild=discord.Object(id=i))
         await ctx.message.delete()
         return await ctx.send("Command tree synced!", delete_after=10)
 

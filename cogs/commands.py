@@ -1,5 +1,5 @@
-import asyncio
 import contextlib
+import asyncio
 from enum import Enum
 from itertools import chain
 from random import choice, randint
@@ -12,6 +12,8 @@ from utils.functions import generate_news
 from functools import partial
 from io import BytesIO
 import aiohttp
+from asyncio import sleep
+from contextlib import suppress
 
 
 def channel_whitelisted():
@@ -298,6 +300,54 @@ class BenCommands(commands.Cog, name="Commands"):
         except UnidentifiedImageError:
             return await inter.response.send_message(f"\U0001f4f0 Invalid image data, unable to create news", ephemeral=True)
         return await inter.response.send_message(file=discord.File(news, filename="news.png"))
+    
+    @app_commands.command(name="voice", description="Call with Ben in a voice channel")
+    @app_commands.guilds(discord.Object(id=899238901837881404))
+    async def call_voice(self, inter: discord.Interaction) -> discord.Message:
+        if inter.user.voice is None or inter.guild is None:
+            return await inter.response.send_message("\U0000260E You must be in a server voice channel")
+        elif inter.guild.voice_client in self.bot.voice_clients:
+            return await inter.response.send_message("\U0000260E I am already in a call. End the current call and try again")
+        
+        await inter.response.defer()
+        if inter.guild.voice_client is None:
+            await inter.user.voice.channel.connect()
+        await inter.followup.send("\U0000260E Calling...")
+        inter.guild.voice_client.play(discord.FFmpegOpusAudio("files/pickup.opus"))
+        while any(not m.bot for m in inter.guild.me.voice.channel.members):
+            while inter.guild.voice_client.is_playing():
+                await sleep(0.1) # wait until voice client has stopped playing audio
+            await sleep(randint(2,5))
+            if randint(1,15) == 15:
+                inter.guild.voice_client.play(discord.FFmpegOpusAudio("files/hangup.opus"))
+                await inter.guild.voice_client.disconnect()
+                return await inter.followup.send(f"\U0000260E Ended call in voice channel `{inter.guild.me.voice.channel.name}`")
+            audio_choice = choice(("hohoho", "no", "yes", "ugh"))
+            if inter.guild.voice_client is None:
+                return
+            inter.guild.voice_client.play(discord.FFmpegOpusAudio(f"files/{audio_choice}.opus"))
+        while inter.guild.voice_client.is_playing():
+            await sleep(0.1) # wait until voice client has stopped playing audio
+        inter.guild.voice_client.play(discord.FFmpegOpusAudio("files/hangup.opus"))
+        await inter.guild.voice_client.disconnect()
+        return await inter.followup.send(f"\U0000260E Ended call in voice channel `{inter.guild.me.voice.channel.name}`")
+        
+            
+    @app_commands.command(name="endvoice", description="End a call in a voice channel")
+    @app_commands.guilds(discord.Object(id=899238901837881404))
+    async def endvoice(self, inter: discord.Interaction) -> discord.Message:
+        if inter.guild.voice_client not in self.bot.voice_clients:
+            return await inter.response.send_message("\U0000260E I am not connected to a voice channel")
+        elif inter.user not in inter.guild.me.voice.channel.members:
+            return await inter.response.send_message("\U0000260E You must be in the same voice channel as the call to perform this action")
+        else:
+            await inter.response.defer()
+            while inter.guild.voice_client.is_playing():
+                await sleep(0.1) # wait until voice client has stopped playing audio
+            inter.guild.voice_client.play(discord.FFmpegOpusAudio("files/hangup.opus"))
+            await inter.guild.voice_client.disconnect()
+            return await inter.followup.send(f"\U0000260E Ended call in voice channel `{inter.guild.me.voice.channel.name}`")
+            
         
 
 async def setup(bot: commands.Bot) -> None:
