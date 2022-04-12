@@ -304,9 +304,9 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.command(name="voice", description="Call with Ben in a voice channel")
     async def call_voice(self, inter: discord.Interaction) -> discord.Message:
         if inter.user.voice is None or inter.guild is None:
-            return await inter.response.send_message("\U0000260E You must be in a server voice channel")
+            return await inter.response.send_message("\U0000260E You must be in a server voice channel", ephemeral=True)
         elif inter.guild.voice_client in self.bot.voice_clients:
-            return await inter.response.send_message("\U0000260E I am already in a call. End the current call and try again")
+            return await inter.response.send_message("\U0000260E I am already in a call. End the current call and try again", ephemeral=True)
         
         await inter.response.defer()
         if inter.guild.voice_client is None:
@@ -335,9 +335,9 @@ class BenCommands(commands.Cog, name="Commands"):
     @app_commands.command(name="endvoice", description="End a call in a voice channel")
     async def endvoice(self, inter: discord.Interaction) -> discord.Message:
         if inter.guild.voice_client not in self.bot.voice_clients:
-            return await inter.response.send_message("\U0000260E I am not connected to a voice channel")
+            return await inter.response.send_message("\U0000260E I am not connected to a voice channel", ephemeral=True)
         elif inter.user not in inter.guild.me.voice.channel.members:
-            return await inter.response.send_message("\U0000260E You must be in the same voice channel as the call to perform this action")
+            return await inter.response.send_message("\U0000260E You must be in the same voice channel as the call to perform this action", ephemeral=True)
         else:
             await inter.response.defer()
             while inter.guild.voice_client.is_playing():
